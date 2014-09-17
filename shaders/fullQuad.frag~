@@ -1,0 +1,13 @@
+#version 120
+
+uniform float time;
+uniform vec2 resolution;
+uniform sampler2D colorTexture;
+uniform sampler2D secondTarget;
+
+void main () {
+	vec2 uv = gl_FragCoord.xy / resolution;
+	vec4 color = texture2D(colorTexture, uv).rgba;
+	vec4 second = texture2D(secondTarget, uv).rgba;
+	gl_FragColor = vec4(color.rgb*second.r, 1.0);
+}

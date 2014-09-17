@@ -1,0 +1,11 @@
+#version 330
+
+in vec3 vPosition;
+
+uniform mat4 modelViewProjectionMatrix;
+
+void main () {
+	vec4 vec = vec4(vPosition, 1.0);
+	gl_Position = (modelViewProjectionMatrix) * vec;
+
+}

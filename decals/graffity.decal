@@ -1,0 +1,5 @@
+<!-- decal xml format -->
+<decal>
+	<!-- decal texture path -->
+	<texture>res/graffity.png</texture>
+</decal>

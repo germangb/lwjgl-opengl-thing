@@ -1,0 +1,97 @@
+package game;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.vecmath.Vector3f;
+
+import framework.Framework;
+import framework.engine.DynamicObject;
+import framework.engine.GameObject;
+import framework.engine.IGameUpdater;
+import framework.engine.SoundSourceObject;
+import game.objects.BallObject;
+
+/**
+ * @author germangb
+ *
+ */
+public class BallCollisions implements IGameUpdater {
+	
+	private List<DynamicObject> balls;
+	private long lastCheck;
+	private long stepTime;
+	
+	/**
+	 * Default constructor
+	 */
+	public BallCollisions() {
+		this.balls = new ArrayList<DynamicObject>();
+		this.lastCheck = 0;
+		this.stepTime = 50;
+	}
+	
+	/**
+	 * Add a new ball to the collection
+	 * @param ball
+	 */
+	public void addBall (DynamicObject ball) {
+		this.balls.add(ball);
+	}
+	
+	/**
+	 * remove a ball from the collision manager
+	 * @param ball
+	 */
+	public void removeBall (DynamicObject ball) {
+		this.balls.remove(ball);
+	}
+	
+	//
+	// IGameUpdater interface implementation
+	//
+	
+	@Override
+	public void update(GameObject object) {
+		long now = Framework.getInstance().getLocalTime();
+		if (now - lastCheck > stepTime) {
+			lastCheck = now;
+			
+			List<DynamicObject> balls = new ArrayList<DynamicObject>(this.balls);
+			for (DynamicObject objA : balls) {
+				Vector3f posA = objA.position();
+				Vector3f velA = objA.velocity();
+				float radiusA = ((BallObject)objA.findGameObjects("model").get(0)).getRadius();
+				for (DynamicObject objB : balls) {
+					if (objA == objB) continue;
+					Vector3f posB = objB.position();
+					Vector3f velB = objB.velocity();
+					float radiusB = ((BallObject)objB.findGameObjects("model").get(0)).getRadius();
+					Vector3f d = new Vector3f(posA.x - posB.x, posA.y - posB.y, posA.z - posB.z);
+					float len = d.length();
+					if (len < radiusA+radiusB) {
+						if (len == 0.0f)
+							d = new Vector3f(1.0f, 0.0f, 0.0f);
+						d.normalize();
+						float lenA = velA.length();
+						float lenB = velB.length();
+						float vLen = Math.max(lenA, lenB) * 0.75f;
+						objA.velocity().x = d.x * vLen;
+						objA.velocity().y = d.y * vLen;
+						objA.velocity().z = d.z * vLen;
+						objB.velocity().x = -d.x * vLen;
+						objB.velocity().y = -d.y * vLen;
+						objB.velocity().z = -d.z * vLen;
+						if (vLen > 4.0)
+							((SoundSourceObject)objA.findGameObjects("bounce_sound").get(0)).play();
+					}
+				}
+			}
+		}
+	}
+	
+	//
+	// END
+	//
+
+}
