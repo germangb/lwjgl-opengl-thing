@@ -5,9 +5,9 @@ import javax.vecmath.Vector3f;
 import org.lwjgl.util.vector.Matrix4f;
 
 import engine.GameNode;
+import engine.Scene;
 import engine.SoundSource;
 import engine.framework.Framework;
-import engine.framework.Scene;
 
 /**
  * @author germangb

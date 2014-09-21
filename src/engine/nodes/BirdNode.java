@@ -10,10 +10,10 @@ import org.lwjgl.util.vector.Matrix4f;
 
 import engine.GameNode;
 import engine.IGameRenderer;
+import engine.IResourceLoader;
+import engine.ResourceManager;
+import engine.Time;
 import engine.WorldGlobals;
-import engine.framework.IResourceLoader;
-import engine.framework.ResourceManager;
-import engine.framework.Time;
 import engine.graphics.Shader;
 
 /**

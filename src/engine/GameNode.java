@@ -16,7 +16,6 @@ import org.lwjgl.util.vector.Vector4f;
 import engine.framework.Framework;
 import engine.framework.LinearUtils;
 import engine.framework.MatrixStack;
-import engine.framework.Scene;
 import engine.nodes.CameraNode;
 
 /**
@@ -33,7 +32,7 @@ public abstract class GameNode {
 	private Set<IGameUpdater> updaters;
 	private Set<IGameRenderer> renderers;
 	private Set<IMessageListener> messageListeners;
-	private IGameRenderer debugRenderer;
+	protected IGameRenderer debugRenderer = null;
 	
 	/* properties */
 	private boolean visible;
@@ -155,14 +154,6 @@ public abstract class GameNode {
 	 */
 	public void addGameUpdater (IGameUpdater updater) {
 		this.updaters.add(updater);
-	}
-	
-	/**
-	 * set the debug renderer for this node
-	 * @param renderer rendered "implementator"
-	 */
-	public void setDebugRenderer (IGameRenderer renderer) {
-		this.debugRenderer = renderer;
 	}
 	
 	/**
@@ -548,7 +539,7 @@ public abstract class GameNode {
 			MATRIX_STACK.transform(localModel);
 			
 			/* if there is a renderer then calculare everything */
-			if (!renderers.isEmpty() && ( gPass && writeGbuffer || !gPass )) {
+			if ((!renderers.isEmpty() || debug && debugRenderer != null) && ( gPass && writeGbuffer || !gPass )) {
 				
 				/* view matrix */
 				Matrix4f viewMatrix = new Matrix4f();
@@ -567,7 +558,7 @@ public abstract class GameNode {
 				Matrix4f modelView = LinearUtils.getModelViewMatrix(modelMatrix, viewMatrix);
 				
 				/* debug render */
-				if (debug && !shadowPass) {
+				if (debug && !shadowPass && debugRenderer != null) {
 					/* push attributes to avoid problems */
 					GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 					debugRenderer.render(modelViewProj, modelView, viewMatrix);
@@ -575,16 +566,18 @@ public abstract class GameNode {
 					GL11.glPopAttrib();
 				}
 				
-				/* render renderers */
-				List<IGameRenderer> safeRenderers = new ArrayList<IGameRenderer>(renderers);
-				for (IGameRenderer render : safeRenderers) {
-					/* push attributes to avoid problems */
-					GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-					render.render(modelViewProj, modelView, viewMatrix);
-					/* pop attributes */
-					GL11.glPopAttrib();
+				if (!renderers.isEmpty()) {
+					/* render renderers */
+					List<IGameRenderer> safeRenderers = new ArrayList<IGameRenderer>(renderers);
+					for (IGameRenderer render : safeRenderers) {
+						/* push attributes to avoid problems */
+						GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+						render.render(modelViewProj, modelView, viewMatrix);
+						/* pop attributes */
+						GL11.glPopAttrib();
+					}
+					safeRenderers.clear();
 				}
-				safeRenderers.clear();
 			}
 			
 			// copy everything in a new list to avoid

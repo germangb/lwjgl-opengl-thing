@@ -6,6 +6,11 @@ import javax.vecmath.Vector3f;
 import engine.*;
 import engine.framework.*;
 import engine.graphics.*;
+import engine.gui.Button;
+import engine.gui.GuiController;
+import engine.gui.IActionListener;
+import engine.gui.RootWidget;
+import engine.gui.Widget;
 import engine.nodes.BirdNode;
 import engine.nodes.CameraNode;
 import engine.nodes.DecalNode;
@@ -27,12 +32,20 @@ public class Project {
 		Scene.getInstance().getRoot().addGameUpdater(new IGameUpdater () {
 			float acum = 0.0f;
 			int count = 0;
+			float max = Float.MIN_VALUE;
+			float min = Float.MAX_VALUE;
 			@Override
 			public void update(GameNode object) {
-				acum += 1.0f / Time.getDeltaTime();
+				if (Time.getDeltaTime() > 0.0)
+					acum += 1.0f / Time.getDeltaTime();
+				else return;
 				++count;
 				if (count == 60) {
-					//Framework.getInstance().setWindowTitle(acum/60+" FPS");
+					//Framework.getInstance().setWindowTitle(acum/128+" FPS");
+					float fps = acum/60;
+					max = Math.max(fps, max);
+					min = Math.min(fps, min);
+					Framework.getInstance().log("FPS ["+fps+"] - MAX ["+max+"] - MIN ["+min+"]");
 					count = 0;
 					acum = 0;
 				}
@@ -58,6 +71,7 @@ public class Project {
 			float x = 0;
 			float y = 0;
 			float z = 0;
+			float offs = 0;
 			@Override
 			public void update(GameNode object) {
 				int mx = Input.getMouseDX();
@@ -102,6 +116,10 @@ public class Project {
 				float cx = x + (float) (Math.sin(a) * Math.cos(b) * r);
 				float cy = y + (float) (Math.sin(b) * r);
 				float cz = z + (float) (Math.cos(a) * Math.cos(b) * r);
+				
+				cx += Math.cos(offs);
+				cz += Math.sin(offs*0.5);
+				offs += dt * Math.PI * 0.5;
 				camera.setPosition(cx, cy, cz);
 				Scene.getInstance().getShadowCamera().setPosition(x, y, z);
 				camera.setRotation(b, -a, 0);
@@ -110,7 +128,7 @@ public class Project {
 		WorldGlobals.FOG_COLOR = 0x726A5F;
 		// 0xe7e2da
 		WorldGlobals.AMBIENT_COLOR = 0xe7e2da; // 0xa3a3f4
-		WorldGlobals.FOG_START = 4.0f;
+		WorldGlobals.FOG_START = 8.0f;
 		WorldGlobals.FOG_DENSITY = 0.03f;
 		Scene scene = Scene.getInstance();
 		
@@ -141,6 +159,31 @@ public class Project {
 				
 			});
 		}
+		
+		/* gui */
+		RootWidget root = new RootWidget();
+		Button bt = new Button();
+		Button bt2 = new Button();
+		Scene.getInstance().getRoot().addGameUpdater(new GuiController(root));
+		scene.getFlatRoot().addChild(root);
+		root.addChild(bt2);
+		root.addChild(bt);
+		bt.setSize(32, 32);
+		bt2.setSize(64, 32);
+		bt.setPosition(128, 64, 0);
+		bt2.setPosition(16, 16, 0);
+		bt.addListener(new IActionListener () {
+			@Override
+			public void action(Widget who) {
+				System.out.println("CLICK!");
+			}
+		});
+		bt2.addListener(new IActionListener () {
+			@Override
+			public void action(Widget who) {
+				System.out.println("CLICK! 2");
+			}
+		});
 		
 		scene.setShadowQuality(Quality.HIGH);
 		scene.setRenderShadows(true);
@@ -301,7 +344,7 @@ public class Project {
  				float z = ray[0].z+lambda*ray[1].z; 
 				DecalNode dec = new DecalNode(splat);
 				dec.setPosition(x, 0, z);
-				dec.setRotation(0, (float) (Math.PI*Math.random()) * 2, 0);
+				dec.setRotation((float) (Math.PI*Math.random()) * 0.25f, (float) (Math.PI*Math.random()) * 2, 0);
 				dec.setSize(20,20,20);
 				terrain.addChild(dec);
 				SoundSourceNode sobj = new SoundSourceNode("splat", bloodSound);
@@ -309,11 +352,16 @@ public class Project {
 				sobj.play();
 				dec.addGameUpdater(new IGameUpdater () {
 					float op = 1;
+					long time = -1;
 					@Override
 					public void update(GameNode object) {
-						dec.setOpacity(op);
-						op -= 0.25 * Time.getDeltaTime();
-						if (op < 0) dec.isolate();
+						if (time == -1)
+							time = Time.getLocalTime() + 3000;
+						if (Time.getLocalTime() > time) {
+							dec.setOpacity(op);
+							op -= 0.25 * Time.getDeltaTime();
+							if (op < 0) dec.isolate();
+						}
 					}
 					
 				});
@@ -321,16 +369,16 @@ public class Project {
 			
 		});
 		
-		/*for (int i = -4; i < 4; ++i) {
-			for (int x = -4; x < 4; ++x) {
+		for (int i = -8; i < 8; ++i) {
+			for (int x = -8; x < 8; ++x) {
 				if (i == 0 && x == 0) continue;
-				DecalNode dec = new DecalNode(Math.random() < 0.5 ? splat : explos);
+				DecalNode dec = new DecalNode(splat);
 				dec.setPosition(32*i, 0, 32*x);
 				dec.setRotation((float) (Math.PI*Math.random())*0.25f, (float) (Math.PI*Math.random())*0.25f, (float) (Math.PI*Math.random())*0.25f);
 				dec.setSize(20,20,20);
 				terrain.addChild(dec);
 			}
-		}*/
+		}
 		
 	}
 	

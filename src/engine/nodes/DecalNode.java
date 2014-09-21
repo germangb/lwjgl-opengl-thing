@@ -13,9 +13,9 @@ import org.lwjgl.util.vector.Matrix4f;
 import engine.Decal;
 import engine.GameNode;
 import engine.IGameRenderer;
+import engine.Scene;
 import engine.WorldGlobals;
 import engine.framework.Framework;
-import engine.framework.Scene;
 import engine.graphics.PolyModel;
 import engine.graphics.Shader;
 
@@ -53,7 +53,7 @@ public class DecalNode extends GameNode implements IGameRenderer {
 		this.boxRender = new BoxDebugRenderer(1.0f, 1.0f, 1.0f);
 		writeGbuffer = false;
 		addGameRenderer(this);
-		setDebugRenderer(boxRender);
+		debugRenderer = boxRender;
 	}
 	
 	/**

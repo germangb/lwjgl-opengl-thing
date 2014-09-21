@@ -13,8 +13,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
-import engine.framework.IResourceLoader;
-import engine.framework.ResourceManager;
+import engine.IResourceLoader;
+import engine.ResourceManager;
 
 /**
  * @author germangb

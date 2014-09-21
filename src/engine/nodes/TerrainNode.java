@@ -10,8 +10,8 @@ import javax.vecmath.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import engine.GameNode;
-import engine.framework.IResourceLoader;
-import engine.framework.ResourceManager;
+import engine.IResourceLoader;
+import engine.ResourceManager;
 
 /**
  * @author germangb

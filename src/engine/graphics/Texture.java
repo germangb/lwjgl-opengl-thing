@@ -14,8 +14,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
-import engine.framework.IResourceLoader;
-import engine.framework.ResourceManager;
+import engine.IResourceLoader;
+import engine.ResourceManager;
 
 /**
  * @author germangb

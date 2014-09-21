@@ -8,9 +8,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.util.WaveData;
 
-import engine.framework.IResourceLoader;
-import engine.framework.ResourceManager;
-
 /**
  * @author germangb
  *

@@ -10,6 +10,7 @@ import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Matrix4f;
 
 import engine.GameNode;
+import engine.Scene;
 import engine.nodes.CameraNode;
 
 /**

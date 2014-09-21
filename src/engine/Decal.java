@@ -9,8 +9,6 @@ import org.lwjgl.opengl.GL11;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import engine.framework.IResourceLoader;
-import engine.framework.ResourceManager;
 import engine.graphics.Texture;
 
 /**

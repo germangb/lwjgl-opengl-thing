@@ -13,11 +13,11 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
 
 import engine.IGameRenderer;
+import engine.IResourceLoader;
+import engine.ResourceManager;
+import engine.Scene;
 import engine.WorldGlobals;
-import engine.framework.IResourceLoader;
 import engine.framework.LinearUtils;
-import engine.framework.ResourceManager;
-import engine.framework.Scene;
 import engine.graphics.Shader;
 
 /**

@@ -10,8 +10,8 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import engine.framework.IResourceLoader;
-import engine.framework.ResourceManager;
+import engine.IResourceLoader;
+import engine.ResourceManager;
 
 /**
  * @author germangb
