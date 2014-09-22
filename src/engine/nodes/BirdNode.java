@@ -27,7 +27,8 @@ public class BirdNode extends GameNode implements IGameRenderer, IResourceLoader
 			.fromFile("shaders/bird.vert", "shaders/bird.frag");
 	
 	/* vertex buffer */
-	private int vbo;
+	private static boolean loaded = false;
+	private static int vbo = -1;
 		
 	/**
 	 * Default constructor
@@ -36,7 +37,10 @@ public class BirdNode extends GameNode implements IGameRenderer, IResourceLoader
 		super("bird");
 		this.writeShadow = false;
 		addGameRenderer(this);
-		ResourceManager.addResources(this);
+		if (!loaded) {
+			loaded = true;
+			ResourceManager.addResources(this);
+		}
 	}
 	
 	//

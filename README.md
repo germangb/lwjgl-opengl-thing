@@ -7,4 +7,4 @@ lwjgl-opengl-thing
 	<li>Sound with OpenAl</li>
 </ul>
 
-<img src="http://i.imgur.com/RIkVyqJ.png">
+<img src="http://i.imgur.com/7GoNf38.png">

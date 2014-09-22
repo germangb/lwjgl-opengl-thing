@@ -54,6 +54,7 @@ public class Project {
 		
 		setUp();
 		Framework.getInstance().setWindowSize(width, height);
+		Framework.getInstance().setWindowTitle("Window");
 		Framework.getInstance().start();
 	}
 	
