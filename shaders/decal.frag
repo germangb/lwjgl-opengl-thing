@@ -9,6 +9,7 @@ uniform vec3 ambientTint;
 uniform sampler2D colorTexture;
 uniform sampler2D depth;
 uniform sampler2D scene;
+uniform sampler2D secondTexture;
 uniform vec2 resolution;
 uniform mat4 invProj;
 uniform mat4 invMvp;
@@ -42,7 +43,8 @@ void main () {
 		tex.a *= opacity;
 		if (tex.a < 0.01) discard;
 		vec4 sce = texture2D(scene, uv);
-		tex.rgb *= sce.a;// lighting
+		//tex.rgb *= sce.a; // lighting
+		tex.rgb *= texture2D(secondTexture, uv).r; // lighting
 		tex.rgb *= ambientTint;
 		// fog applied to the decal
 		float dist = abs(worldPos.z);

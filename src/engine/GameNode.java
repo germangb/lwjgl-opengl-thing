@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import javax.vecmath.Vector3f;
 
-import org.lwjgl.opengl.GL11;
+//import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -560,10 +560,10 @@ public abstract class GameNode {
 				/* debug render */
 				if (debug && !shadowPass && debugRenderer != null) {
 					/* push attributes to avoid problems */
-					GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+					//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 					debugRenderer.render(modelViewProj, modelView, viewMatrix);
 					/* pop attributes */
-					GL11.glPopAttrib();
+					//GL11.glPopAttrib();
 				}
 				
 				if (!renderers.isEmpty()) {
@@ -571,10 +571,10 @@ public abstract class GameNode {
 					List<IGameRenderer> safeRenderers = new ArrayList<IGameRenderer>(renderers);
 					for (IGameRenderer render : safeRenderers) {
 						/* push attributes to avoid problems */
-						GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+						//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 						render.render(modelViewProj, modelView, viewMatrix);
 						/* pop attributes */
-						GL11.glPopAttrib();
+						//GL11.glPopAttrib();
 					}
 					safeRenderers.clear();
 				}

@@ -19,8 +19,9 @@ import engine.ResourceManager;
  */
 public class TerrainNode extends GameNode implements IResourceLoader {
 
+	/* hardcoded map information */
 	private static float SCALE = 4.0f;
-	private static float HEIGHT = 32.0f;
+	private static float HEIGHT = 16.0f;
 	private static int SIZE = 512;
 	
 	/**
@@ -125,7 +126,7 @@ public class TerrainNode extends GameNode implements IResourceLoader {
 	 * THIS METHOD ASUMES the (0,0) to be the center
 	 * of the height-map in world space coordinates.
 	 * 
-	 * Return the road, based on discrete
+	 * Return the height, based on discrete
 	 * height information and interpolation
 	 * 
 	 * when triangles are treated as units equations
@@ -135,8 +136,9 @@ public class TerrainNode extends GameNode implements IResourceLoader {
 	 * 
 	 * @param x X coordinate
 	 * @param z Z coordinate
+	 * @param array Array where the samples are taken from
 	 */
-	public float getRoad (float x, float z) {
+	private float bariInterpol (float x, float z, float[][] array) {
 		int row = (int) (x / SCALE + SIZE/2);
 		int col = (int) (z / SCALE + SIZE/2);
 		
@@ -152,64 +154,10 @@ public class TerrainNode extends GameNode implements IResourceLoader {
 		intZ = 1-intZ;
 		
 		/* height values */
-		float h0 = roadValues[row][col];
-		float h1 = roadValues[row][col+1];
-		float h2 = roadValues[row+1][col+1];
-		float h3 = roadValues[row+1][col];
-		
-		/* check triangle */
-		if (intX+intZ<1.0f) {
-			float coef1 = -(intX+intZ-1);
-			float coef2 = intX;
-			float coef3 = 1.0f - coef2 - coef1;
-			return (coef3 * h0 + coef2 * h2 + coef1 * h1);
-		} else {
-			// this case is the same one as before but
-			// mirrored
-			intX = 1-intX;
-			intZ = 1-intZ;
-			float coef1 = -(intX+intZ-1);
-			float coef2 = intX;
-			float coef3 = 1.0f - coef2 - coef1;
-			return (coef3 * h2 + coef2 * h0 + coef1 * h3);
-		}
-	}
-	
-	/**
-	 * THIS METHOD ASUMES the (0,0) to be the center
-	 * of the height-map in world space coordinates.
-	 * 
-	 * Return the sand, based on discrete
-	 * height information and interpolation
-	 * 
-	 * when triangles are treated as units equations
-	 * are stupidly simple
-	 * 
-	 * http://en.wikipedia.org/wiki/Barycentric_coordinate_system
-	 * 
-	 * @param x X coordinate
-	 * @param z Z coordinate
-	 */
-	public float getSand (float x, float z) {
-		int row = (int) (x / SCALE + SIZE/2);
-		int col = (int) (z / SCALE + SIZE/2);
-		
-		/* clamp position */
-		if (row < 0) row = 0;
-		else if (row >= SIZE-1) row = SIZE-2;
-		if (col < 0) col = 0;
-		else if (col >= SIZE-1) col = SIZE-2;
-		float intX = (x+SIZE/2*SCALE)/SCALE;
-		float intZ = (z+SIZE/2*SCALE)/SCALE;
-		intX -= (int)intX;
-		intZ -= (int)intZ;
-		intZ = 1-intZ;
-		
-		/* height values */
-		float h0 = sandValues[row][col];
-		float h1 = sandValues[row][col+1];
-		float h2 = sandValues[row+1][col+1];
-		float h3 = sandValues[row+1][col];
+		float h0 = array[row][col];
+		float h1 = array[row][col+1];
+		float h2 = array[row+1][col+1];
+		float h3 = array[row+1][col];
 		
 		/* check triangle */
 		if (intX+intZ<1.0f) {
@@ -230,111 +178,43 @@ public class TerrainNode extends GameNode implements IResourceLoader {
 	}
 
 	/**
-	 * THIS METHOD ASUMES the (0,0) to be the center
-	 * of the height-map in world space coordinates.
-	 * 
-	 * Return the concrete, based on discrete
-	 * height information and interpolation
-	 * 
-	 * when triangles are treated as units equations
-	 * are stupidly simple
-	 * 
-	 * http://en.wikipedia.org/wiki/Barycentric_coordinate_system
-	 * 
-	 * @param x X coordinate
-	 * @param z Z coordinate
+	 * Get normalized road value (above 0.5 is considered to be road)
+	 * @param x local X coordinate
+	 * @param z local Z coordinate
+	 * @return
+	 */
+	public float getRoad (float x, float z) {
+		return bariInterpol(x, z, roadValues);
+	}
+
+	/**
+	 * Get normalized sand value (above 0.5 is considered to be sand)
+	 * @param x local X coordinate
+	 * @param z local Z coordinate
+	 * @return
+	 */
+	public float getSand (float x, float z) {
+		return bariInterpol(x, z, sandValues);
+	}
+
+	/**
+	 * Get normalized concrete value (above 0.5 is considered to be concrete)
+	 * @param x local X coordinate
+	 * @param z local Z coordinate
+	 * @return
 	 */
 	public float getConcrete (float x, float z) {
-		int row = (int) (x / SCALE + SIZE/2);
-		int col = (int) (z / SCALE + SIZE/2);
-		
-		/* clamp position */
-		if (row < 0) row = 0;
-		else if (row >= SIZE-1) row = SIZE-2;
-		if (col < 0) col = 0;
-		else if (col >= SIZE-1) col = SIZE-2;
-		float intX = (x+SIZE/2*SCALE)/SCALE;
-		float intZ = (z+SIZE/2*SCALE)/SCALE;
-		intX -= (int)intX;
-		intZ -= (int)intZ;
-		intZ = 1-intZ;
-		
-		/* height values */
-		float h0 = concreteValues[row][col];
-		float h1 = concreteValues[row][col+1];
-		float h2 = concreteValues[row+1][col+1];
-		float h3 = concreteValues[row+1][col];
-		
-		/* check triangle */
-		if (intX+intZ<1.0f) {
-			float coef1 = -(intX+intZ-1);
-			float coef2 = intX;
-			float coef3 = 1.0f - coef2 - coef1;
-			return (coef3 * h0 + coef2 * h2 + coef1 * h1);
-		} else {
-			// this case is the same one as before but
-			// mirrored
-			intX = 1-intX;
-			intZ = 1-intZ;
-			float coef1 = -(intX+intZ-1);
-			float coef2 = intX;
-			float coef3 = 1.0f - coef2 - coef1;
-			return (coef3 * h2 + coef2 * h0 + coef1 * h3);
-		}
+		return bariInterpol(x, z, concreteValues);
 	}
 	
 	/**
-	 * THIS METHOD ASUMES the (0,0) to be the center
-	 * of the height-map in world space coordinates.
-	 * 
-	 * Return the height, based on discrete
-	 * height information and interpolation
-	 * 
-	 * when triangles are treated as units equations
-	 * are stupidly simple
-	 * 
-	 * http://en.wikipedia.org/wiki/Barycentric_coordinate_system
-	 * 
-	 * @param x X coordinate
-	 * @param z Z coordinate
+	 * Get normalized height value (above 0.5 is considered to be height)
+	 * @param x local X coordinate
+	 * @param z local Z coordinate
+	 * @return
 	 */
 	public float getHeight (float x, float z) {
-		int row = (int) (x / SCALE + SIZE/2);
-		int col = (int) (z / SCALE + SIZE/2);
-		
-		/* clamp position */
-		if (row < 0) row = 0;
-		else if (row >= SIZE-1) row = SIZE-2;
-		if (col < 0) col = 0;
-		else if (col >= SIZE-1) col = SIZE-2;
-		float intX = (x+SIZE/2*SCALE)/SCALE;
-		float intZ = (z+SIZE/2*SCALE)/SCALE;
-		intX -= (int)intX;
-		intZ -= (int)intZ;
-		intZ = 1-intZ;
-		
-		/* height values */
-		float h0 = heightValues[row][col];
-		float h1 = heightValues[row][col+1];
-		float h2 = heightValues[row+1][col+1];
-		float h3 = heightValues[row+1][col];
-		
-		/* check triangle */
-		if (intX+intZ<1.0f) {
-			float coef1 = -(intX+intZ-1);
-			float coef2 = intX;
-			float coef3 = 1.0f - coef2 - coef1;
-			return (coef3 * h0 + coef2 * h2 + coef1 * h1)*HEIGHT;
-		} else {
-			// this case is the same one as before but
-			// mirrored
-			intX = 1-intX;
-			intZ = 1-intZ;
-			float coef1 = -(intX+intZ-1);
-			float coef2 = intX;
-			float coef3 = 1.0f - coef2 - coef1;
-			return (coef3 * h2 + coef2 * h0 + coef1 * h3)*HEIGHT;
-		}
+		return bariInterpol(x, z, heightValues);
 	}
 	
 	/**

@@ -31,34 +31,35 @@ void main () {
 
 	vec4 finalColor = vec4(grassColor.rgb, 1.0);
 	
+	float borderStrength = 5.5;
 	/* paint sand */
 	vec3 sandLineColor = sandColor.rgb * 1.5;
 	if (sand > 0.5) {
 		float iso = abs(sand - 0.5);
-		finalColor.rgb = mix(sandColor, sandLineColor, exp(-pow( iso , 6.25) * 10000000000.0));
+		finalColor.rgb = mix(sandColor, sandLineColor, exp(-pow( iso , borderStrength) * 10000000000.0));
 	} else {
 		float iso = abs(sand - 0.5);
-		finalColor.rgb = mix(finalColor.rgb, sandLineColor, exp(-pow( iso , 6.25) * 10000000000.0));
+		finalColor.rgb = mix(finalColor.rgb, sandLineColor, exp(-pow( iso , borderStrength) * 10000000000.0));
 	}
 	
 	/* paint concrete */
 	vec3 concreteLineColor = concreteColor.rgb * 1.5;
 	if (concrete > 0.5) {
 		float iso = abs(concrete - 0.5);
-		finalColor.rgb = mix(concreteColor, concreteLineColor, exp(-pow( iso , 6.25) * 10000000000.0));
+		finalColor.rgb = mix(concreteColor, concreteLineColor, exp(-pow( iso , borderStrength) * 10000000000.0));
 	} else {
 		float iso = abs(concrete - 0.5);
-		finalColor.rgb = mix(finalColor.rgb, concreteLineColor, exp(-pow( iso , 6.25) * 10000000000.0));
+		finalColor.rgb = mix(finalColor.rgb, concreteLineColor, exp(-pow( iso , borderStrength) * 10000000000.0));
 	}
 	
 	/* paint road */
 	vec3 roadLineColor = roadColor.rgb * 0.5;
 	if (road > 0.5) {
 		float iso = abs(road - 0.5);
-		finalColor.rgb = mix(roadColor,roadLineColor, exp(-pow( iso , 6.25) * 10000000000.0));
+		finalColor.rgb = mix(roadColor,roadLineColor, exp(-pow( iso , borderStrength) * 10000000000.0));
 	} else {
 		float iso = abs(road - 0.5);
-		finalColor.rgb = mix(finalColor.rgb, roadLineColor, exp(-pow( iso , 6.25) * 10000000000.0));
+		finalColor.rgb = mix(finalColor.rgb, roadLineColor, exp(-pow( iso , borderStrength) * 10000000000.0));
 	}
 
 	/* apply simple lighting */
@@ -71,13 +72,16 @@ void main () {
 		for (float i = 0; i < 2*PI; i += 1.5) {
 			vec2 pois = vec2(cos(i), sin(i));
 			if (texture2D(shadowMap, shadowCoord.xy+pois/sc).z < shadowCoord.z-bias)
-				shadow -= 0.125;
+				shadow -= 0.175;
 		}
 		shadow = clamp(shadow, 0, 1);
 	}
 	light = mix(0.25, 1.0, min(light, shadow));
 	finalColor.rgb *= light;
 
+	/* tint */
+	finalColor.rgb *= ambientTint;
+	
 	/* fog */
 	float dist = abs(position.z);
 	if (dist > fogStart) {
@@ -92,8 +96,6 @@ void main () {
 	//vec3 normal = (normal+1.0)*0.5;
 
 	/* output the color */
-	gl_FragData[0] = vec4(finalColor.rgb, light);
-	
-	/* reflection stuff */
-	gl_FragData[1] = vec4(light, 0, 0, 0);
+	gl_FragData[0] = vec4(finalColor.rgb, 1);
+	gl_FragData[1] = vec4(light, 0, 0, 1);
 }

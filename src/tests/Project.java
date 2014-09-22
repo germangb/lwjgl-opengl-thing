@@ -22,7 +22,7 @@ import engine.resources.Resources;
 
 public class Project {
 	
-	private int width = 640;
+	private int width = 700;
 	private int height = 375;
 	private CameraNode camera;
 	private PolyModel model;
@@ -112,6 +112,7 @@ public class Project {
 				
 				x += v.x;
 				z += v.y;
+				y = terrain.getHeight(x, z);
 				
 				float cx = x + (float) (Math.sin(a) * Math.cos(b) * r);
 				float cy = y + (float) (Math.sin(b) * r);
@@ -170,8 +171,8 @@ public class Project {
 		root.addChild(bt);
 		bt.setSize(32, 32);
 		bt2.setSize(64, 32);
-		bt.setPosition(128, 64, 0);
-		bt2.setPosition(16, 16, 0);
+		bt.setPosition(8+64+8, 8, 0);
+		bt2.setPosition(8, 8, 0);
 		bt.addListener(new IActionListener () {
 			@Override
 			public void action(Widget who) {

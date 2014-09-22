@@ -12,8 +12,8 @@ import engine.GameNode;
 import engine.IGameRenderer;
 import engine.IResourceLoader;
 import engine.ResourceManager;
-import engine.Time;
 import engine.WorldGlobals;
+import engine.framework.Framework;
 import engine.graphics.Shader;
 
 /**
@@ -28,7 +28,6 @@ public class BirdNode extends GameNode implements IGameRenderer, IResourceLoader
 	
 	/* vertex buffer */
 	private int vbo;
-	private float phase;
 		
 	/**
 	 * Default constructor
@@ -38,7 +37,6 @@ public class BirdNode extends GameNode implements IGameRenderer, IResourceLoader
 		this.writeShadow = false;
 		addGameRenderer(this);
 		ResourceManager.addResources(this);
-		this.phase = (float) Math.random() * 8;
 	}
 	
 	//
@@ -46,44 +44,23 @@ public class BirdNode extends GameNode implements IGameRenderer, IResourceLoader
 
 	@Override
 	public void render(Matrix4f mvp, Matrix4f mv, Matrix4f v) {
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-		int program = SHADER.getProgram();
 		SHADER.bind();
 		/* upload mvp */
-		mvp.store(buffer);
-		buffer.flip();
-		int mvpLoc = GL20.glGetUniformLocation(program, "modelViewProjectionMatrix");
-		GL20.glUniformMatrix4(mvpLoc, false, buffer);
-		/* upload time */
-		int timeLoc = GL20.glGetUniformLocation(program, "time");
-		GL20.glUniform1f(timeLoc, Time.getLocalTime() * 0.001f + phase);
-		
-		/* upload fog start */
-		int fogStartLocation = GL20.glGetUniformLocation(program, "fogStart");
-		GL20.glUniform1f(fogStartLocation, WorldGlobals.FOG_START);
-		
-		/* upload fog constant */
-		int fogConstLocation = GL20.glGetUniformLocation(program, "fogConst");
-		GL20.glUniform1f(fogConstLocation, WorldGlobals.FOG_DENSITY);
-		
-		/* upload fog color */
-		int fogColorLocation = GL20.glGetUniformLocation(program, "fogColor");
-		int fogColor = WorldGlobals.FOG_COLOR;
-		GL20.glUniform3f(fogColorLocation, ((fogColor>>16)&0xFF)/255.0f, ((fogColor>>8)&0xFF)/255.0f, ((fogColor>>0)&0xFF)/255.0f);
-		
-		/* upload tint color */
-		int tintColorLocation = GL20.glGetUniformLocation(program, "ambientTint");
+		SHADER.uniformMat4("modelViewProjectionMatrix", false, mvp);
+
 		int ambientColor = WorldGlobals.AMBIENT_COLOR;
-		GL20.glUniform3f(tintColorLocation, ((ambientColor>>16)&0xFF)/255.0f, ((ambientColor>>8)&0xFF)/255.0f, ((ambientColor>>0)&0xFF)/255.0f);
-		
+		int fogColor = WorldGlobals.FOG_COLOR;
+		SHADER.uniform1f("time", Framework.getInstance().getLocalTime()*0.001f);
+		SHADER.uniform1f("fogStart", WorldGlobals.FOG_START);
+		SHADER.uniform1f("fogConst", WorldGlobals.FOG_DENSITY);
+		SHADER.uniform3f("fogColor", ((fogColor>>16)&0xFF)/255.0f, ((fogColor>>8)&0xFF)/255.0f, ((fogColor>>0)&0xFF)/255.0f);
+		SHADER.uniform3f("ambientTint", ((ambientColor>>16)&0xFF)/255.0f, ((ambientColor>>8)&0xFF)/255.0f, ((ambientColor>>0)&0xFF)/255.0f);
 		
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 		GL20.glEnableVertexAttribArray(Shader.POSITION_ATTRIB);
 		GL20.glVertexAttribPointer(Shader.POSITION_ATTRIB, 3, GL11.GL_FLOAT, false, 0, 0);
-		//GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 		GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 10);
 		GL20.glDisableVertexAttribArray(Shader.POSITION_ATTRIB);
-		buffer.clear();
 	}
 	
 	//

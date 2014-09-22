@@ -1,11 +1,9 @@
 package engine.nodes;
 
-import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
 
 import engine.GameNode;
@@ -39,49 +37,38 @@ public class VoxelNode extends GameNode implements IGameRenderer {
 	
 	@Override
 	public void render(Matrix4f mvp, Matrix4f mv, Matrix4f v) {
-		int program = SHADER.getProgram();
+		//int program = SHADER.getProgram();
 		
 		/* bind shader */
 		SHADER.bind();
 		
 		/* mvp upload */
-		int mvpLoc = GL20.glGetUniformLocation(program, "modelViewProjectionMatrix");
+		/*int mvpLoc = GL20.glGetUniformLocation(program, "modelViewProjectionMatrix");
 		FloatBuffer mvpBuffer = BufferUtils.createFloatBuffer(16);
 		mvp.store(mvpBuffer);
 		mvpBuffer.flip();
 		GL20.glUniformMatrix4(mvpLoc, false, mvpBuffer);
-		mvpBuffer.clear();
+		mvpBuffer.clear();*/
+		SHADER.uniformMat4("modelViewProjectionMatrix", false, mvp);
 		
 		/* mv upload */
-		int mvLoc = GL20.glGetUniformLocation(program, "modelViewMatrix");
+		/*int mvLoc = GL20.glGetUniformLocation(program, "modelViewMatrix");
 		FloatBuffer mvBuffer = BufferUtils.createFloatBuffer(16);
 		mv.store(mvBuffer);
 		mvBuffer.flip();
 		GL20.glUniformMatrix4(mvLoc, false, mvBuffer);
-		mvBuffer.clear();
+		mvBuffer.clear();*/
+		SHADER.uniformMat4("modelViewMatrix", false, mv);
 				
 		/* upload time */
-		int timeLoc = GL20.glGetUniformLocation(program, "time");
-		GL20.glUniform1f(timeLoc, Framework.getInstance().getLocalTime()*0.001f);
-		
-		/* upload fog start */
-		int fogStartLocation = GL20.glGetUniformLocation(program, "fogStart");
-		GL20.glUniform1f(fogStartLocation, WorldGlobals.FOG_START);
-		
-		/* upload fog constant */
-		int fogConstLocation = GL20.glGetUniformLocation(program, "fogConst");
-		GL20.glUniform1f(fogConstLocation, WorldGlobals.FOG_DENSITY);
-		
-		/* upload fog color */
-		int fogColorLocation = GL20.glGetUniformLocation(program, "fogColor");
-		int fogColor = WorldGlobals.FOG_COLOR;
-		GL20.glUniform3f(fogColorLocation, ((fogColor)&0xFF)/255.0f, ((fogColor>>8)&0xFF)/255.0f, ((fogColor>>0)&0xFF)/255.0f);
-		
-		/* upload tint color */
-		int tintColorLocation = GL20.glGetUniformLocation(program, "ambientTint");
 		int ambientColor = WorldGlobals.AMBIENT_COLOR;
-		GL20.glUniform3f(tintColorLocation, ((ambientColor>>16)&0xFF)/255.0f, ((ambientColor>>8)&0xFF)/255.0f, ((ambientColor>>0)&0xFF)/255.0f);
-		
+		int fogColor = WorldGlobals.FOG_COLOR;
+		SHADER.uniform1f("time", Framework.getInstance().getLocalTime()*0.001f);
+		SHADER.uniform1f("fogStart", WorldGlobals.FOG_START);
+		SHADER.uniform1f("fogConst", WorldGlobals.FOG_DENSITY);
+		SHADER.uniform3f("fogColor", ((fogColor>>16)&0xFF)/255.0f, ((fogColor>>8)&0xFF)/255.0f, ((fogColor>>0)&0xFF)/255.0f);
+		SHADER.uniform3f("ambientTint", ((ambientColor>>16)&0xFF)/255.0f, ((ambientColor>>8)&0xFF)/255.0f, ((ambientColor>>0)&0xFF)/255.0f);
+
 		/* draw model */
 		int vbo = model.vbo;
 		int cbo = model.cbo;

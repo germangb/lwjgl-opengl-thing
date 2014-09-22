@@ -4,9 +4,8 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
+//import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import engine.framework.Framework;
@@ -201,7 +200,7 @@ public final class Scene implements IResourceLoader {
 		Framework frame = Framework.getInstance();
 		
 		/* render full screen quad to screen */
-		int colorTexture = RENDER_TARGET.getColorTexture(0).getId();
+		//int colorTexture = RENDER_TARGET.getColorTexture(0).getId();
 		
 		/* set up basic */
 		GL11.glClearColor(0, 0, 0, 1);
@@ -213,20 +212,24 @@ public final class Scene implements IResourceLoader {
 		SHADER.bind();
 		
 		/* get texture locations */
-		int colorLoc = GL20.glGetUniformLocation(SHADER.getProgram(), "colorTexture");
-		int resLoc = GL20.glGetUniformLocation(SHADER.getProgram(), "resolution");
+		//int colorLoc = GL20.glGetUniformLocation(SHADER.getProgram(), "colorTexture");
+		//int resLoc = GL20.glGetUniformLocation(SHADER.getProgram(), "resolution");
 		
 		/* upload time */
-		int time = GL20.glGetUniformLocation(SHADER.getProgram(), "time");
-		GL20.glUniform1f(time, Framework.getInstance().getLocalTime() * 0.001f);
+		//int time = GL20.glGetUniformLocation(SHADER.getProgram(), "time");
+		SHADER.uniform1f("time", Framework.getInstance().getLocalTime() * 0.001f);
+		//GL20.glUniform1f(time, Framework.getInstance().getLocalTime() * 0.001f);
 		
 		/* bind uniforms */
-		GL20.glUniform1i(colorLoc, 0);
-		GL20.glUniform2f(resLoc, frame.getWindowWidth(), frame.getWindowHeight());
+		//GL20.glUniform1i(colorLoc, 0);
+		SHADER.uniform1i("colorTexture", 0);
+		SHADER.uniform2f("resolution", frame.getWindowWidth(), frame.getWindowHeight());
+		//GL20.glUniform2f(resLoc, frame.getWindowWidth(), frame.getWindowHeight());
 
 		/* bind textures */
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorTexture);
+		RENDER_TARGET.getColorTexture(0).bindTo(0);
+		//GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		//GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorTexture);
 		
 		/* render vbo */
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
@@ -253,6 +256,10 @@ public final class Scene implements IResourceLoader {
 	
 	public Texture getSceneTexture () {
 		return GBUFFER_TARGET.getColorTexture(0);
+	}
+	
+	public Texture getDataTexture () {
+		return GBUFFER_TARGET.getColorTexture(1);
 	}
 	
 	/**
@@ -316,7 +323,7 @@ public final class Scene implements IResourceLoader {
 		
 		/* create objects */
 		RENDER_TARGET = new FrameBuffer(width/scale, height/scale, 1);
-		GBUFFER_TARGET = new FrameBuffer(width/scale, height/scale, 1);
+		GBUFFER_TARGET = new FrameBuffer(width/scale, height/scale, 2);
 		int shadowMapWidth = 512;	// medium
 		int shadowMapHeight = 512;
 		// determine shadow-map resolution

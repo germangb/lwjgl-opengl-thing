@@ -57,7 +57,7 @@ void main () {
 		}
 		shadow = clamp(shadow, 0, 1);
 	}
-	light = mix(0.35, 1.0, min(light, shadow));
+	light = mix(0.25, 1.0, min(light, shadow));
 	finalColor.rgb *= light;
 
 	/* tint */
@@ -76,5 +76,6 @@ void main () {
 	//vec3 normal = (normal+1.0)*0.5;
 	
 	/* output the color */
-	fragData0 = vec4(finalColor.rgb, light);
+	fragData0 = vec4(finalColor.rgb, 1);
+	fragData1 = vec4(light,0,0,1);
 }

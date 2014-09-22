@@ -4,10 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URL;
+import java.nio.FloatBuffer;
 import java.util.Scanner;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.vector.Matrix4f;
 
 import engine.IResourceLoader;
 import engine.ResourceManager;
@@ -34,6 +37,10 @@ public class Shader implements IResourceLoader {
 	/* last used program */
 	/* avoid rebinding the same shader */
 	private static int used = -1;
+	/*private static int lastTick = -1;
+	private static int switchCount = 0;
+	*/
+	private static FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 	
 	/**
 	 * Instantiate a shader given the path of the vertex and fragment
@@ -97,18 +104,57 @@ public class Shader implements IResourceLoader {
 	 * Bind program shader
 	 */
 	public void bind () {
+		/*if (Framework.getInstance().getTicks() != lastTick) {
+			Framework.getInstance().log(switchCount+" shader switches");
+			switchCount = 0;
+			lastTick = Framework.getInstance().getTicks();
+		}*/
+		
 		if (used != id) {
 			used = id;
 			GL20.glUseProgram(id);
+			//++switchCount;
 		}
+	}
+	
+	public void uniform1i (String uniform, int i) {
+		int loc = GL20.glGetUniformLocation(id, uniform);
+		GL20.glUniform1i(loc, i);
+	}
+	
+	public void uniform1f (String uniform, float x) {
+		int loc = GL20.glGetUniformLocation(id, uniform);
+		GL20.glUniform1f(loc, x);
+	}
+	
+	public void uniform2f (String uniform, float x, float y) {
+		int loc = GL20.glGetUniformLocation(id, uniform);
+		GL20.glUniform2f(loc, x, y);
+	}
+	
+	public void uniform3f (String uniform, float x, float y, float z) {
+		int loc = GL20.glGetUniformLocation(id, uniform);
+		GL20.glUniform3f(loc, x, y, z);
+	}
+	
+	public void uniform4f (String uniform, float x, float y, float z, float w) {
+		int loc = GL20.glGetUniformLocation(id, uniform);
+		GL20.glUniform4f(loc, x, y, z, w);
+	}
+	
+	public void uniformMat4 (String uniform, boolean traspose, Matrix4f mat4) {
+		int loc = GL20.glGetUniformLocation(id, uniform);
+		mat4.store(buffer);
+		buffer.flip();
+		GL20.glUniformMatrix4(loc, traspose, buffer);
 	}
 	
 	/**
 	 * @return OpenGL program
 	 */
-	public int getProgram () {
+	/*public int getProgram () {
 		return id;
-	}
+	}*/
 
 	//
 	// BEGIN IResourceLoader interface implementation

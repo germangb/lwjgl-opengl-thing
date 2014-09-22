@@ -53,20 +53,22 @@ void main () {
 		for (float i = 0; i < 2*PI; i += 1.5) {
 			vec2 pois = vec2(cos(i), sin(i));
 			if (texture2D(shadowMap, shadowCoord.xy+pois/sc).z < shadowCoord.z-bias)
-				shadow -= 0.125;
+				shadow -= 0.175;
 		}
 		shadow = clamp(shadow, 0, 1);
 	}
-	light = mix(0.25, 1.0, min(light, shadow));
+	light = mix(0.5, 1.0, min(light, shadow));
 	finalColor.rgb *= light;
 
+	/* tint */
+	finalColor.rgb *= ambientTint;
+	
 	/* fog */
 	float dist = abs(position.z);
 	if (dist > fogStart) {
 		float fog = 1.0 - exp(-(dist-fogStart) * fogConst);
 		finalColor.rgb = mix(finalColor.rgb, fogColor, mix(0, 0.9, fog));
 	}
-	
 	/* tint */
 	finalColor.rgb *= ambientTint;
 	
@@ -74,6 +76,6 @@ void main () {
 	//vec3 normal = (normal+1.0)*0.5;
 	
 	/* output the color */
-	fragData0 = vec4(finalColor.rgb, light);
-	fragData1 = vec4(light, 0, 0, 0);
+	fragData0 = vec4(finalColor.rgb, 1);
+	fragData1 = vec4(light,0,0,1);
 }

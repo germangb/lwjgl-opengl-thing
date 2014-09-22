@@ -29,6 +29,9 @@ public class Texture implements IResourceLoader {
 	 */
 	private static Map<String, Texture> files = new HashMap<String, Texture>();
 
+	/**
+	 * binded texture units
+	 */
 	private static int[] binded = new int[8];
 	
 	/**
@@ -83,6 +86,11 @@ public class Texture implements IResourceLoader {
 		return this;
 	}
 	
+	/**
+	 * @param s
+	 * @param t
+	 * @return
+	 */
 	public Texture setWarp (int s, int t) {
 		this.warpS = s;
 		this.warpT = t;
@@ -99,20 +107,20 @@ public class Texture implements IResourceLoader {
 		if (binded[unit] != id) {
 			GL13.glActiveTexture(GL13.GL_TEXTURE0+unit);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
-			//binded[unit] = id;
+			binded[unit] = id;
 		}
 	}
 	
 	/**
-	 * @return
+	 * @return texture id
 	 */
-	public int getId () {
+	/*public int getId () {
 		return id;
-	}
+	}*/
 	
-	public String getSource () {
+	/*public String getSource () {
 		return source;
-	}
+	}*/
 
 	//
 	// IResourceLoader interface implementation
