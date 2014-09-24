@@ -10,6 +10,7 @@ import engine.gui.Button;
 import engine.gui.GuiController;
 import engine.gui.IActionListener;
 import engine.gui.RootWidget;
+import engine.gui.TextLabel;
 import engine.gui.Widget;
 import engine.nodes.BirdNode;
 import engine.nodes.CameraNode;
@@ -22,36 +23,13 @@ import engine.resources.Resources;
 
 public class Project {
 	
-	private int width = 700;
-	private int height = 375;
+	private int width = 640;
+	private int height = 350;
 	private CameraNode camera;
 	private PolyModel model;
 	private ModelNode figure;
 	
 	public Project() {
-		Scene.getInstance().getRoot().addGameUpdater(new IGameUpdater () {
-			float acum = 0.0f;
-			int count = 0;
-			float max = Float.MIN_VALUE;
-			float min = Float.MAX_VALUE;
-			@Override
-			public void update(GameNode object) {
-				if (Time.getDeltaTime() > 0.0)
-					acum += 1.0f / Time.getDeltaTime();
-				else return;
-				++count;
-				if (count == 60) {
-					//Framework.getInstance().setWindowTitle(acum/128+" FPS");
-					float fps = acum/60;
-					max = Math.max(fps, max);
-					min = Math.min(fps, min);
-					Framework.getInstance().log("FPS ["+fps+"] - MAX ["+max+"] - MIN ["+min+"]");
-					count = 0;
-					acum = 0;
-				}
-			}
-		});
-		
 		setUp();
 		Framework.getInstance().setWindowSize(width, height);
 		Framework.getInstance().setWindowTitle("Window");
@@ -129,10 +107,65 @@ public class Project {
 		});
 		WorldGlobals.FOG_COLOR = 0x726A5F;
 		// 0xe7e2da
-		WorldGlobals.AMBIENT_COLOR = 0xe7e2da; // 0xa3a3f4
+		WorldGlobals.AMBIENT_COLOR = 0xe7e2da;
 		WorldGlobals.FOG_START = 8.0f;
 		WorldGlobals.FOG_DENSITY = 0.03f;
 		Scene scene = Scene.getInstance();
+		
+		/* gui */
+		TextLabel fpsText = new TextLabel("...");
+		fpsText.setPosition(8, height-16 - 8, 0);
+		RootWidget root = new RootWidget();
+
+		SoundSource clickSnd = new SoundSource(Resources.get("button.wav"), true, false);
+		SoundSourceNode click = new SoundSourceNode("click", clickSnd);
+		Scene.getInstance().getRoot().addChild(click);
+		IActionListener list = new IActionListener () {
+			@Override
+			public void action(Widget who) {
+				System.out.println("CLICK!");
+				click.play();
+			}
+		};
+		
+		Scene.getInstance().getRoot().addGameUpdater(new GuiController(root));
+		scene.getFlatRoot().addChild(root);
+		for (int i = 0; i < 10; ++i) {
+			int r = i/5;
+			int c = i%5;
+			Button bt = new Button();
+			root.addChild(bt);
+			root.addChild(fpsText);
+			bt.setSize(128, 32);
+			bt.setPosition(128*c, 32*r, 0);
+			bt.addListener(list);
+		}
+		
+		scene.getRoot().addGameUpdater(new IGameUpdater () {
+			float acum = 0.0f;
+			int count = 0;
+			float max = Float.MIN_VALUE;
+			float min = Float.MAX_VALUE;
+			@Override
+			public void update(GameNode object) {
+				if (Time.getDeltaTime() > 0.0)
+					acum += 1.0f / Time.getDeltaTime();
+				else return;
+				++count;
+				if (count == 60) {
+					//Framework.getInstance().setWindowTitle(acum/128+" FPS");
+					float fps = acum/60;
+					max = Math.max(fps, max);
+					min = Math.min(fps, min);
+					String log = "FPS: "+fps+" - MAX: "+max+" - MIN: "+min;
+					fpsText.setText(log);
+					//Framework.getInstance().log(log);
+					count = 0;
+					acum = 0;
+				}
+			}
+		});
+		
 		
 		for (int i = 0; i < 8; ++i) {
 			BirdNode bird = new BirdNode();
@@ -161,31 +194,6 @@ public class Project {
 				
 			});
 		}
-		
-		/* gui */
-		RootWidget root = new RootWidget();
-		Button bt = new Button();
-		Button bt2 = new Button();
-		Scene.getInstance().getRoot().addGameUpdater(new GuiController(root));
-		scene.getFlatRoot().addChild(root);
-		root.addChild(bt2);
-		root.addChild(bt);
-		bt.setSize(32, 32);
-		bt2.setSize(64, 32);
-		bt.setPosition(8+64+8, 8, 0);
-		bt2.setPosition(8, 8, 0);
-		bt.addListener(new IActionListener () {
-			@Override
-			public void action(Widget who) {
-				System.out.println("CLICK!");
-			}
-		});
-		bt2.addListener(new IActionListener () {
-			@Override
-			public void action(Widget who) {
-				System.out.println("CLICK! 2");
-			}
-		});
 		
 		scene.setShadowQuality(Quality.HIGH);
 		scene.setRenderShadows(true);
@@ -281,6 +289,7 @@ public class Project {
 			DecalNode mod = swe;
 			@Override
 			public void update(GameNode object) {
+				
 				//System.out.println(mod.getPosition()+"  "+mod.getRotation());
 				if (Input.isKeyDown(Input.KEY_X)) fix = 'X';
 				if (Input.isKeyDown(Input.KEY_Y)) fix = 'Y';

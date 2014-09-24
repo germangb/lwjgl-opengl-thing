@@ -33,7 +33,7 @@ void main () {
 	
 	float borderStrength = 5.5;
 	/* paint sand */
-	vec3 sandLineColor = sandColor.rgb * 1.5;
+	vec3 sandLineColor = grassColor.rgb * 0.5;
 	if (sand > 0.5) {
 		float iso = abs(sand - 0.5);
 		finalColor.rgb = mix(sandColor, sandLineColor, exp(-pow( iso , borderStrength) * 10000000000.0));

@@ -1,5 +1,6 @@
 package engine.framework;
 
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -220,6 +221,18 @@ public class Input {
 	 */
 	public static void setMouseGrabbed (boolean b) {
 		Mouse.setGrabbed(b);
+	}
+	
+	/**
+	 * @param cursor
+	 */
+	public static void setMouseCursor (NativeCursor cursor) {
+		try {
+			Mouse.setNativeCursor(cursor.getCursor());
+		} catch (LWJGLException e) {
+			/* output to the error stream */
+			e.printStackTrace(Framework.getInstance().getErrStream());
+		}
 	}
 
 }

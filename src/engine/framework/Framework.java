@@ -1,9 +1,13 @@
 package engine.framework;
 
 import java.awt.Canvas;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -227,6 +231,13 @@ public final class Framework {
 			GL11.glGetError();
 			AL10.alGetError();
 		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			NativeCursor cursor = new NativeCursor(ImageIO.read(new File("res/cursor.png")), 9, 28);
+			Input.setMouseCursor(cursor);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		

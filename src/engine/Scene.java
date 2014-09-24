@@ -183,6 +183,7 @@ public final class Scene implements IResourceLoader {
 			usedCamera = FLAT_CAMERA;
 			GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 			flatRoot.render(false, false);
+			GL11.glEnable(GL11.GL_CULL_FACE);
 			GL11.glPopAttrib();
 			usedCamera = aux;
 		}
