@@ -7,6 +7,7 @@ import engine.*;
 import engine.framework.*;
 import engine.graphics.*;
 import engine.gui.Button;
+import engine.gui.Container;
 import engine.gui.GuiController;
 import engine.gui.IActionListener;
 import engine.gui.RootWidget;
@@ -106,7 +107,6 @@ public class Project {
 			}
 		});
 		WorldGlobals.FOG_COLOR = 0x726A5F;
-		// 0xe7e2da
 		WorldGlobals.AMBIENT_COLOR = 0xe7e2da;
 		WorldGlobals.FOG_START = 8.0f;
 		WorldGlobals.FOG_DENSITY = 0.03f;
@@ -116,6 +116,7 @@ public class Project {
 		TextLabel fpsText = new TextLabel("...");
 		fpsText.setPosition(8, height-16 - 8, 0);
 		RootWidget root = new RootWidget();
+		root.setSize(width, height);
 
 		SoundSource clickSnd = new SoundSource(Resources.get("button.wav"), true, false);
 		SoundSourceNode click = new SoundSourceNode("click", clickSnd);
@@ -130,16 +131,60 @@ public class Project {
 		
 		Scene.getInstance().getRoot().addGameUpdater(new GuiController(root));
 		scene.getFlatRoot().addChild(root);
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 5; ++i) {
 			int r = i/5;
 			int c = i%5;
 			Button bt = new Button();
+			bt.setText("Btn#"+i);
 			root.addChild(bt);
 			root.addChild(fpsText);
-			bt.setSize(128, 32);
-			bt.setPosition(128*c, 32*r, 0);
+			bt.setSize(width/5, 32);
+			bt.setPosition(width/5*c, 32*r, 0);
 			bt.addListener(list);
+			bt.setDebug(true);
 		}
+		
+		Container container = new Container();
+		TextLabel text = new TextLabel("<meaningful message here>");
+		//text.setAlignment(Widget.Alignment.MIDDLE);
+		text.setPosition(8, 8, 0);
+		container.setDebug(true);
+		container.addChild(text);
+		container.setSize(300, 160);
+		container.setPosition(width/2-300/2, height/2-175/2,0);
+		root.addChild(container);
+		
+		Button close = new Button();
+		close.addListener(list);
+		close.addListener(new IActionListener () {
+
+			@Override
+			public void action(Widget who) {
+				container.setTranslateSmooth(32);
+				container.addGameUpdater(new IGameUpdater () {
+					float t = 0;
+					float from = container.getPosition().x;
+					float to = width + 64;
+					Interpolation inter = Interpolation.EASEIN;
+					@Override
+					public void update(GameNode object) {
+						t += Time.getDeltaTime();
+						Vector3f pos = container.getPosition();
+						pos.x = inter.apply(from, to, t);
+						container.setPosition(pos);
+						if (t > 1.0f) container.removeGameUpdater(this);
+					}
+					
+				});
+			}
+			
+		});
+		container.addChild(close);
+		close.setDebug(true);
+		close.setPosition(0, container.getSize().height - 32 - 4, 0);
+		close.setAlignment(Widget.Alignment.MIDDLE);
+		close.setText("close");
+		close.setSize(128, 32);
 		
 		scene.getRoot().addGameUpdater(new IGameUpdater () {
 			float acum = 0.0f;
@@ -224,18 +269,6 @@ public class Project {
 		swe.setPosition(-16, 0, 16);
 		terrain.addChild(swe);
 		
-		SoundSource loopSound = new SoundSource(Resources.get("tone.wav"), false, true);
-		SoundSourceNode lobj = new SoundSourceNode("loop", loopSound);
-		swe.addChild(lobj);
-		//lobj.play();
-		
-		Decal cebra = new Decal("decals/cebra.decal");
-		DecalNode ceb = new DecalNode(cebra);
-		ceb.setSize(32, 4, 16);
-		ceb.setPosition(37.847725f, 0.0f, -38.863556f);
-		ceb.setRotation(0,-0.1f,0);
-		terrain.addChild(ceb);
-
 		Decal cats = new Decal("decals/cats.decal");
 		DecalNode cat = new DecalNode(cats);
 		cat.setSize(12, 4, 6);
@@ -244,6 +277,13 @@ public class Project {
 		cat.setOpacity(0.75f);
 		terrain.addChild(cat);
 		
+		Decal cebra = new Decal("decals/cebra.decal");
+		DecalNode ceb = new DecalNode(cebra);
+		ceb.setSize(32, 4, 16);
+		ceb.setPosition(37.847725f, 0.0f, -38.863556f);
+		ceb.setRotation(0,-0.1f,0);
+		terrain.addChild(ceb);
+
 		DecalNode ceb1 = new DecalNode(cebra);
 		ceb1.setSize(32, 4, 16);
 		ceb1.setPosition(20.488823f, 0.0f, 88.46739f);

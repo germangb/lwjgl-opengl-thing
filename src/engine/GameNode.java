@@ -149,11 +149,27 @@ public abstract class GameNode {
 	}
 	
 	/**
+	 * remove a game renderer to this object
+	 * @param renderer renderer to be removed
+	 */
+	public void removeGameRenderer (IGameRenderer renderer) {
+		this.renderers.remove(renderer);
+	}
+	
+	/**
 	 * Add a game updater
 	 * @param updater new game updater to be added
 	 */
 	public void addGameUpdater (IGameUpdater updater) {
 		this.updaters.add(updater);
+	}
+	
+	/**
+	 * Remove a game updater
+	 * @param updater new game updater to be removed
+	 */
+	public void removeGameUpdater (IGameUpdater updater) {
+		this.updaters.remove(updater);
 	}
 	
 	/**

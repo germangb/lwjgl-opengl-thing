@@ -32,7 +32,7 @@ public class TerrainView implements IResourceLoader, IGameRenderer {
 			.fromFile(
 					"shaders/terrain.vert",
 					"shaders/terrain.frag");
-
+	
 	/* terrain thing */
 	private TerrainNode terrain;
 	

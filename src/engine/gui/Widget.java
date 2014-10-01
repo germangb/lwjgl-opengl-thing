@@ -18,6 +18,14 @@ import engine.framework.Input;
 public abstract class Widget extends GameNode {
 
 	/**
+	 * @author germangb
+	 *
+	 */
+	public static enum Alignment {
+		LEFT, MIDDLE, RIGHT
+	}
+	
+	/**
 	 * reference to the hovered widget
 	 */
 	private static Widget HOVERED_WIDGET = null;
@@ -44,6 +52,7 @@ public abstract class Widget extends GameNode {
 		return ACTIVE_WIDGET;
 	}
 	
+	private Alignment align;
 	private Dimension dim;
 	private Set<IActionListener> listeners;
 	
@@ -61,11 +70,12 @@ public abstract class Widget extends GameNode {
 	 */
 	public Widget(String key, float width, float height) {
 		super(key);
+		this.align = Alignment.LEFT;
 		this.dim = new Dimension();
 		setSize(width, height);
 		this.listeners = new HashSet<IActionListener>();
 		this.listeners = new HashSet<IActionListener>();
-		this.debugRenderer = new WidgetQuadRenderer(this);
+		this.debugRenderer = new WidgetQuadRenderer(this, false);
 	}
 	
 	/**
@@ -92,6 +102,15 @@ public abstract class Widget extends GameNode {
 	 */
 	public void removeListener (IActionListener listener) {
 		this.listeners.remove(listener);
+	}
+
+	/**
+	 * Set widget alignment relative
+	 * to parent
+	 * @param align
+	 */
+	public void setAlignment (Alignment align) {
+		this.align = align;
 	}
 	
 	/**
@@ -168,6 +187,33 @@ public abstract class Widget extends GameNode {
 	//
 	// GameNode re-implementation
 	//
+	
+	@SuppressWarnings("incomplete-switch")
+	@Override
+	public void update () {
+		Vector3f pos = this.getPosition();
+		switch (align) {
+			case MIDDLE:
+				/* modify x position */
+				/* to match the alignment */
+				if ( (getParent() == null) || !(getParent() instanceof Widget) )
+					throw new RuntimeException();
+				int pw = ((Widget)getParent()).getSize().width;
+				pos.x = pw/2 - dim.width/2;
+				setPosition(pos);
+				break;
+			case RIGHT:
+				/* modify x position */
+				/* to match the alignment */
+				if ( (getParent() == null) || !(getParent() instanceof Widget) )
+					throw new RuntimeException();
+				pw = ((Widget)getParent()).getSize().width;
+				pos.x = pw - dim.width;
+				setPosition(pos);
+				break;
+		}
+		super.update();
+	}
 
 	@Override
 	public void addChild (GameNode child) {
