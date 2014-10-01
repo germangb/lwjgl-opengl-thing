@@ -8,8 +8,8 @@ import java.util.Set;
 import javax.vecmath.Vector3f;
 
 import engine.GameNode;
+import engine.Input;
 import engine.framework.Framework;
-import engine.framework.Input;
 
 /**
  * @author germangb
@@ -182,6 +182,15 @@ public abstract class Widget extends GameNode {
 	 */
 	public boolean isHovered () {
 		return HOVERED_WIDGET == this;
+	}
+	
+	/**
+	 * return if the widget is being
+	 * pressed by the mouse cursor
+	 * @return
+	 */
+	public boolean isActive () {
+		return isHovered() && Input.isMouseDown(0);
 	}
 	
 	//

@@ -45,6 +45,7 @@ public class WidgetQuadRenderer implements IGameRenderer, IResourceLoader {
 	@Override
 	public void render(Matrix4f mvp, Matrix4f mv, Matrix4f v) {
 		SHADER.bind();
+		SHADER.uniform3f("offset", 0, 0, 0);
 		SHADER.uniformMat4("modelViewProjectionMatrix", false, mvp);
 		float r = 0;
 		float g = 0;
@@ -60,6 +61,8 @@ public class WidgetQuadRenderer implements IGameRenderer, IResourceLoader {
 		GL11.glVertexPointer(3, GL11.GL_FLOAT, 0, 0);
 		SHADER.uniform3f("scale", widget.getSize().width, widget.getSize().height, 1);
 		GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
+		//SHADER.uniform3f("scale", widget.getSize().width, 4, 1);
+		//GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}

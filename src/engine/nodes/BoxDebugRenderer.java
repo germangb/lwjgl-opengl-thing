@@ -54,6 +54,7 @@ public class BoxDebugRenderer implements IGameRenderer {
 		float signX = x/Math.abs(x);
 		float signY = y/Math.abs(y);
 		float signZ = z/Math.abs(z);
+		SHADER.uniform3f("offset", 0, 0, 0);
 		SHADER.uniform3f("scale", x + signX*0.1f, y*1.05f + signY*0.1f, z*1.05f + signZ*0.1f);
 		SHADER.uniformMat4("modelViewProjectionMatrix", false, mvp);
 		SHADER.uniform4f("tint", 1, 1, 1, 1);

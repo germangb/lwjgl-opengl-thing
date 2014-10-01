@@ -12,6 +12,7 @@ import engine.graphics.PolyModel;
 import engine.graphics.Texture;
 import engine.gui.Button;
 import engine.gui.Container;
+import engine.gui.GreenButtonView;
 import engine.gui.GuiController;
 import engine.gui.IActionListener;
 import engine.gui.RootWidget;
@@ -32,7 +33,7 @@ import engine.resources.Resources;
 public class Reasemble {
 
 	private int width = 640;
-	private int height = 375;
+	private int height = 350;
 	
 	/* nodes */
 	private CameraNode camera;
@@ -58,6 +59,7 @@ public class Reasemble {
 		RootWidget root = new RootWidget();
 		flatRoot.addChild(root);
 		root.setSize(width, height);
+		root.addChild(fpsText);
 
 		SoundSource clickSnd = new SoundSource(Resources.get("button.wav"), true, false);
 		SoundSourceNode click = new SoundSourceNode("click", clickSnd);
@@ -65,16 +67,16 @@ public class Reasemble {
 		
 		Scene.getInstance().getRoot().addGameUpdater(new GuiController(root));
 		scene.getFlatRoot().addChild(root);
+		
 		for (int i = 0; i < 5; ++i) {
-			int r = i/5;
 			int c = i%5;
 			Button bt = new Button();
 			bt.setText("Btn#"+i);
 			root.addChild(bt);
 			root.addChild(fpsText);
 			bt.setSize(width/5, 32);
-			bt.setPosition(width/5*c, 32*r, 0);
-			bt.setDebug(true);
+			bt.setPosition(width/5*c, 0, 0);
+			bt.addGameRenderer(new GreenButtonView(bt, true));
 		}
 		
 		Container container = new Container();
@@ -88,7 +90,7 @@ public class Reasemble {
 		
 		Button close = new Button();
 		container.addChild(close);
-		close.setDebug(true);
+		close.addGameRenderer(new GreenButtonView(close, false));
 		close.setPosition(0, container.getSize().height - 32 - 4, 0);
 		close.setAlignment(Widget.Alignment.MIDDLE);
 		close.setText("close");
@@ -147,6 +149,12 @@ public class Reasemble {
 		camera = new PerspectiveCamera("camera", (float)Math.toRadians(55), (float)width/height, 0.1f, 200);
 		terrain = new TerrainNode();
 		camera.addGameUpdater(new CameraController(camera));
+		
+		/* sound */
+		SoundSource ambient = new SoundSource(Resources.get("ambient.wav"), true, true);
+		SoundSourceNode ambientNode = new SoundSourceNode("birds", ambient);
+		root.addChild(ambientNode);
+		ambientNode.play();
 		
 		/* cebra */
 		Decal cebra = new Decal("decals/cebra.decal");
@@ -211,6 +219,7 @@ public class Reasemble {
 	}
 	
 	public static void main (String[] args) {
+		//System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
 		new Reasemble();
 	}
 
