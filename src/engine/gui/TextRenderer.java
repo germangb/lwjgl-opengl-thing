@@ -20,7 +20,7 @@ public class TextRenderer implements IGameRenderer {
 	/* rendered text */
 	private String text;
 	private int width, height;
-	//private int warp;
+	private int rgba;
 	
 	/**
 	 * Default constructor
@@ -34,6 +34,7 @@ public class TextRenderer implements IGameRenderer {
 	 */
 	public TextRenderer(String text) {
 		setText(text);
+		this.rgba = 0xFFFFFFFF;
 	}
 	
 	/**
@@ -41,20 +42,12 @@ public class TextRenderer implements IGameRenderer {
 	 */
 	public void setText (String text) {
 		this.text = text;
-		//this.warp = Integer.MAX_VALUE;
 		String[] apl = text.split("\n");
 		this.width = 0;
 		this.height = 0;//apl.length * 16;
 		for (int i = 0; i < apl.length; ++i)
 			this.width = Math.max(width, apl[i].length()*10);
 	}
-	
-	/**
-	 * @param w
-	 */
-	/*public void setWarpSize (int w) {
-		this.warp = w;
-	}*/
 	
 	/**
 	 * Get the size in pixels
@@ -72,6 +65,21 @@ public class TextRenderer implements IGameRenderer {
 		return height;
 	}
 	
+	/**
+	 * @param rgba
+	 * @return
+	 */
+	public void setTint (int rgba) {
+		this.rgba = rgba;
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getTint () {
+		return rgba;
+	}
+	
 	//
 	// IGameRenderer interface implementation
 	//
@@ -81,7 +89,12 @@ public class TextRenderer implements IGameRenderer {
 		TEXTURE.bindTo(0);
 		SHADER.bind();
 		SHADER.uniformMat4("modelViewProjectionMatrix", false, mvp);
-		SHADER.uniform1i("testure", 0);
+		SHADER.uniform1i("texture", 0);
+		float r = ((rgba >> 24) & 0xFF) / 255.0f;
+		float g = ((rgba >> 16) & 0xFF) / 255.0f;
+		float b = ((rgba >> 8) & 0xFF) / 255.0f;
+		float a = ((rgba >> 0) & 0xFF) / 255.0f;
+		SHADER.uniform4f("tint", r, g, b, a);
 		/* inmediate mode... */
 		GL11.glBegin(GL11.GL_QUADS);
 		float acumX = 0;

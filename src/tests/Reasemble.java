@@ -61,12 +61,42 @@ public class Reasemble {
 		root.setSize(width, height);
 		root.addChild(fpsText);
 
-		SoundSource clickSnd = new SoundSource(Resources.get("button.wav"), true, false);
+		SoundSource clickSnd = new SoundSource(Resources.get("click.wav"), true, false);
 		SoundSourceNode click = new SoundSourceNode("click", clickSnd);
 		Scene.getInstance().getRoot().addChild(click);
 		
 		Scene.getInstance().getRoot().addGameUpdater(new GuiController(root));
 		scene.getFlatRoot().addChild(root);
+		
+		Container container = new Container();
+		TextLabel text = new TextLabel("<meaningful message here>\n\n     .....\n      ...\n       .\n\nNot implemented!");
+		text.setColor(0xFFFFFF88);
+		text.setPosition(8, 8, 0);
+		container.setDebug(true);
+		container.addChild(text);
+		container.setSize(300, 170);
+		container.setPosition(width/2-300/2, height/2-175/2,0);
+		root.addChild(container);
+		
+		IActionListener closeDialog = new IActionListener () {
+
+			@Override
+			public void action(Widget who) {
+				click.play();
+				container.setVisible(false);
+			}
+			
+		};
+		
+		IActionListener openDialog = new IActionListener () {
+
+			@Override
+			public void action(Widget who) {
+				click.play();
+				container.setVisible(true);
+			}
+			
+		};
 		
 		for (int i = 0; i < 5; ++i) {
 			int c = i%5;
@@ -76,17 +106,9 @@ public class Reasemble {
 			root.addChild(fpsText);
 			bt.setSize(width/5, 32);
 			bt.setPosition(width/5*c, 0, 0);
+			bt.addListener(openDialog);
 			bt.addGameRenderer(new GreenButtonView(bt, true));
 		}
-		
-		Container container = new Container();
-		TextLabel text = new TextLabel("<meaningful message here>");
-		text.setPosition(8, 8, 0);
-		container.setDebug(true);
-		container.addChild(text);
-		container.setSize(300, 160);
-		container.setPosition(width/2-300/2, height/2-175/2,0);
-		root.addChild(container);
 		
 		Button close = new Button();
 		container.addChild(close);
@@ -95,14 +117,7 @@ public class Reasemble {
 		close.setAlignment(Widget.Alignment.MIDDLE);
 		close.setText("close");
 		close.setSize(128, 32);
-		close.addListener(new IActionListener () {
-
-			@Override
-			public void action(Widget who) {
-				container.setVisible(false);
-			}
-			
-		});
+		close.addListener(closeDialog);
 		
 		scene.getRoot().addGameUpdater(new IGameUpdater () {
 			float acum = 0.0f;
@@ -219,7 +234,7 @@ public class Reasemble {
 	}
 	
 	public static void main (String[] args) {
-		//System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
+		System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
 		new Reasemble();
 	}
 

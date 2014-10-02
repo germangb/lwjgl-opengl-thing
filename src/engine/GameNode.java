@@ -42,6 +42,12 @@ public abstract class GameNode {
 	private Vector3f position;
 	private Vector3f rotationAxis;
 	
+	/* cached local transformation */
+	private boolean dirty;
+	private boolean hierarchyDirty;
+	private Matrix4f cachedLocalTransform;
+	private Matrix4f cachedGlobalTransform;
+	
 	/* used for interpolation */
 	private Vector3f dposition;
 	private Vector3f drotationAxis;
@@ -65,7 +71,12 @@ public abstract class GameNode {
 		this.renderers = new HashSet<IGameRenderer>();
 		this.messageListeners = new HashSet<IMessageListener>();
 		this.debugRenderer = null;
-		
+		this.dirty = false;
+		this.hierarchyDirty = true;
+		this.cachedLocalTransform = new Matrix4f();
+		this.cachedLocalTransform.setIdentity();
+		this.cachedGlobalTransform = new Matrix4f();
+		this.cachedGlobalTransform.setIdentity();
 		/* set properties */
 		this.position = new Vector3f();
 		this.rotationAxis = new Vector3f();
@@ -217,13 +228,22 @@ public abstract class GameNode {
 	 * @return Model transformation matrix
 	 */
 	public Matrix4f getModelTransformation () {
-		Matrix4f local = getLocalModelTransformation();
-		Matrix4f ret = new Matrix4f();
+		if (hierarchyDirty) {
+			hierarchyDirty = false;
+			cachedGlobalTransform.setIdentity();
+			Matrix4f local = getLocalModelTransformation();
+			/* matrix multiplications */
+			
+			Matrix4f aux = new Matrix4f();
+			if (parent == null)
+				aux = local;
+			else
+				Matrix4f.mul(parent.getModelTransformation(), local, aux);
+			
+			cachedGlobalTransform = aux;
+		}
 		
-		/* recursive multiplication */
-		if (parent == null) ret = local;
-		else Matrix4f.mul(parent.getModelTransformation(), local, ret);
-		return ret;
+		return cachedGlobalTransform;
 	}
 	
 	/**
@@ -233,14 +253,17 @@ public abstract class GameNode {
 	 * @return local model view matrix
 	 */
 	public Matrix4f getLocalModelTransformation () {
-		Matrix4f model = new Matrix4f();
-
-		/* apply transformations */
-		model.translate(new org.lwjgl.util.vector.Vector3f(dposition.x, dposition.y, dposition.z));
-		model.rotate(drotationAxis.x, new org.lwjgl.util.vector.Vector3f(1,0,0));
-		model.rotate(drotationAxis.y, new org.lwjgl.util.vector.Vector3f(0,1,0));
-		model.rotate(drotationAxis.z, new org.lwjgl.util.vector.Vector3f(0,0,1));
-		return model;
+		if (dirty) {
+			dirty = false;
+			cachedLocalTransform.setIdentity();
+			/* apply transformations */
+			cachedLocalTransform.translate(new org.lwjgl.util.vector.Vector3f(position.x, position.y, position.z));
+			cachedLocalTransform.rotate(rotationAxis.x, new org.lwjgl.util.vector.Vector3f(1,0,0));
+			cachedLocalTransform.rotate(rotationAxis.y, new org.lwjgl.util.vector.Vector3f(0,1,0));
+			cachedLocalTransform.rotate(rotationAxis.z, new org.lwjgl.util.vector.Vector3f(0,0,1));
+		}
+		
+		return cachedLocalTransform;
 	}
 	
 	/**
@@ -344,6 +367,20 @@ public abstract class GameNode {
 		return children.size();
 	}
 	
+	/**
+	 * the leaf is dirty as of the invocation
+	 * of this method
+	 */
+	private void dirtifyLeaf () {
+		for (GameNode node : children) {
+			node.hierarchyDirty = true;
+			node.dirtifyLeaf();
+		}
+	}
+	
+	/**
+	 * @return
+	 */
 	public List<GameNode> getChildren () {
 		return new ArrayList<GameNode>(children);
 	}
@@ -380,9 +417,11 @@ public abstract class GameNode {
 	 * @param z new z position
 	 */
 	public void setPosition (float x, float y, float z) {
+		dirty = true;
 		position.x = x;
 		position.y = y;
 		position.z = z;
+		dirtifyLeaf();
 	}
 	
 	/**
@@ -407,9 +446,11 @@ public abstract class GameNode {
 	 * @param z new z rotation
 	 */
 	public void setRotation (float x, float y, float z) {
+		dirty = true;
 		rotationAxis.x = x;
 		rotationAxis.y = y;
 		rotationAxis.z = z;
+		dirtifyLeaf();
 	}
 	
 	/**

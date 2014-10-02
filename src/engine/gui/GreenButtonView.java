@@ -65,17 +65,12 @@ public class GreenButtonView implements IGameRenderer, IResourceLoader {
 		
 		SHADER.uniform3f("scale", button.getSize().width, 4, 1);
 		GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
-		/*SHADER.uniform4f("tint", 0,0,0,0.25f*(1-opacity));
-		SHADER.uniform3f("scale", button.getSize().width, 4, 1);
-		SHADER.uniform3f("offset", 0,button.getSize().height-4,0);
-		GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
-		*/
 		
 		float dt = Time.getDeltaTime();
 		if (button.isHovered()) {
-			opacity += (1-opacity) * dt * 16;
+			opacity += (1-opacity) * dt * 20;
 		} else {
-			opacity += (-opacity) * dt * 16;
+			opacity += (-opacity) * dt * 20;
 		}
 		
 		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);

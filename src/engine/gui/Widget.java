@@ -170,7 +170,8 @@ public abstract class Widget extends GameNode {
 				/* it's been ensured that all the children */
 				/* are are widgets */
 				Widget w = (Widget) child;
-				w.updateTree();
+				if (w.isVisible())	// temporary... (?)
+					w.updateTree();
 			}
 		}
 	}

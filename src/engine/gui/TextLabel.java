@@ -19,6 +19,20 @@ public class TextLabel extends Widget {
 	}
 	
 	/**
+	 * @param rgba
+	 */
+	public void setColor (int rgba) {
+		render.setTint(rgba);
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getColor () {
+		return render.getTint();
+	}
+	
+	/**
 	 * @param text
 	 */
 	public void setText (String text) {
