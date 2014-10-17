@@ -50,7 +50,7 @@ public class TerrainNode extends GameNode implements IResourceLoader {
 		this.concreteMapPath = "maps/test/concrete.png";
 		this.sandMapPath = "maps/test/sand.png";
 		this.roadMapPath = "maps/test/road.png";
-		
+
 		/* add to the resource manager */
 		ResourceManager.addResources(this);
 		

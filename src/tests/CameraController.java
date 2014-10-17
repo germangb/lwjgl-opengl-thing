@@ -73,7 +73,7 @@ public class CameraController implements IGameUpdater {
 		position.z += (positionD.z - position.z) * dt * 8.0f;
 		
 		/* new camera position */
-		float tetha = (float) Math.PI/3;
+		float tetha = (float) Math.PI/3.25f;
 		float cx = position.x + (float) (Math.sin(alpha) * Math.cos(tetha) * radius);
 		float cy = position.y + (float) (Math.sin(tetha) * radius);
 		float cz = position.z + (float) (Math.cos(alpha) * Math.cos(tetha) * radius);
