@@ -8,5 +8,5 @@ lwjgl-opengl-thing
 </ul>
 
 <center>
-<img src="http://i.imgur.com/PLAoNgi.png">
+<img src="http://i.imgur.com/5AVL2u7.png">
 </center>
