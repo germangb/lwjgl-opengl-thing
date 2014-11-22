@@ -4,7 +4,7 @@ lwjgl-opengl-thing
 	<li>Shadow mapping</li>
 	<li>Screen space decals</li>
 	<li>Animated birds flying</li>
-	<li>Directional sound with OpenAL</li>
+	<li>OpenAL 3D sound</li>
 </ul>
 
 <center>
